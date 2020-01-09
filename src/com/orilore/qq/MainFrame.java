@@ -24,26 +24,29 @@ public class MainFrame extends JFrame {
     JButton btnSend = new JButton();
     final int server_port = 2021;
     final int client_port = 2022;
+    
     public MainFrame() {
         try {
             setDefaultCloseOperation(EXIT_ON_CLOSE);
             jbInit();
-            Thread thread = new Thread(){
-                DatagramSocket server = new DatagramSocket(server_port);
-                public void run(){
-                    try {
-                        while(true){
-                            byte[] buf = new byte[1024];
-                            DatagramPacket dp = new DatagramPacket(buf,buf.length);
-                            server.receive(dp);
-                            String msg = new String(dp.getData());
-                            txtRecord.append("对方说:" + msg + "\n");
-                        }
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            };
+            Thread thread = new Thread(
+            	new Runnable() {
+					public void run() {
+						try {
+							DatagramSocket server = new DatagramSocket(server_port);
+	                        while(true){
+	                            byte[] buf = new byte[1024];
+	                            DatagramPacket dp = new DatagramPacket(buf,buf.length);
+	                            server.receive(dp);
+	                            String msg = new String(dp.getData());
+	                            txtRecord.append("对方说:" + msg + "\n");
+	                        }
+	                    } catch (IOException ex) {
+	                        ex.printStackTrace();
+	                    }
+					}
+				}
+            );
             thread.start();
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -65,14 +68,17 @@ public class MainFrame extends JFrame {
         contentPane.add(txtMsg);
         contentPane.add(btnSend);
     }
-
+    
+    private DatagramSocket client;
     public void btnSend_actionPerformed(ActionEvent e) {
         try {
-        	DatagramSocket client = new DatagramSocket();
+        	if(client==null) {
+        		client = new DatagramSocket();
+        	}
             byte[] buf = txtMsg.getText().getBytes();
-            DatagramPacket dp = new DatagramPacket(buf,buf.length,InetAddress.getLocalHost(),client_port);
+            DatagramPacket dp = new DatagramPacket(buf,buf.length,InetAddress.getByName("127.0.0.1"),client_port);
             client.send(dp);
-            txtRecord.append("自己说:"+txtMsg.getText()+"\n");
+            txtRecord.append("\t\t\t\t 自己说:"+txtMsg.getText()+"\n");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
