@@ -14,6 +14,10 @@ public class SocketClient {
 	    OutputStream outputStream = socket.getOutputStream();
 	    String message="你好！";
 	    outputStream.write(message.getBytes("UTF-8"));
+	    message = "天气不错";
+	    outputStream.write(message.getBytes("UTF-8"));
+	    message = "心情也不错";
+	    outputStream.write(message.getBytes("UTF-8"));
 	    outputStream.close();
 	    socket.close();
 	}
